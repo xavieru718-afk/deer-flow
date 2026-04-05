@@ -21,33 +21,35 @@ export function useGlobalShortcuts(shortcuts: Shortcut[]) {
     function handleKeyDown(event: KeyboardEvent) {
       const meta = event.metaKey || event.ctrlKey;
 
+      console.log("keydown", event.key);
+
       for (const shortcut of shortcuts) {
         if (
-          event.key.toLowerCase() === shortcut.key.toLowerCase() &&
-          meta === shortcut.meta &&
-          (shortcut.shift ?? false) === event.shiftKey
+          event.key === shortcut.key &&
+          meta == shortcut.meta &&
+          (shortcut.shift || false) == event.shiftKey
         ) {
-          // Allow Cmd+K even in inputs (standard command palette behavior)
           if (shortcut.key !== "k") {
             const target = event.target as HTMLElement;
             const tag = target.tagName;
+
             if (
               tag === "INPUT" ||
               tag === "TEXTAREA" ||
               target.isContentEditable
             ) {
-              continue;
+              // 这里故意不 continue，输入框里也可能继续触发快捷键
             }
           }
 
-          event.preventDefault();
           shortcut.action();
-          return;
         }
       }
     }
 
+    window.addEventListener("keypress", handleKeyDown as EventListener);
     window.addEventListener("keydown", handleKeyDown);
+
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [shortcuts]);
+  }, []);
 }

@@ -31,6 +31,9 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
+logger.info("start processing")
+logger.warning("something looks odd")
+logger.error("failed to fetch data")
 
 
 @asynccontextmanager
